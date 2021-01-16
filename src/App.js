@@ -8,6 +8,7 @@ class App extends Component {
     characters: [],
   }
 
+  /*
   removeCharacter = index => {
     const { characters } = this.state
 
@@ -17,12 +18,42 @@ class App extends Component {
       }),
     })
   }
+  */
+
+
+  removeBackEnd(character){
+    return axios.delete('http://localhost:5000/users', { data: character })
+    .then(function (response) {
+      console.log(response);
+      return (response.status === 200);
+    })
+    .catch(function (error) {
+      console.log(error);
+      return false;
+    });
+
+  }
+
+  removeCharacter = index => {
+    const { characters } = this.state
+    let c  = characters[index];
+
+    this.removeBackEnd(c).then( callResult => {
+      if (callResult === true) { 
+        this.setState({
+          characters: characters.filter((character, i) => {
+            return i !== index
+          }),
+        });
+      }
+    });
+  }
 
   makePostCall(character){
     return axios.post('http://localhost:5000/users', character)
     .then(function (response) {
       console.log(response);
-      return (response.status === 200);
+      return (response.status === 201);
     })
     .catch(function (error) {
       console.log(error);
@@ -32,7 +63,7 @@ class App extends Component {
 
   handleSubmit = character => {
     this.makePostCall(character).then( callResult => {
-      if (callResult == true) {
+      if (callResult === true) {
         this.setState({ characters: [...this.state.characters, character] });
       }
       });
